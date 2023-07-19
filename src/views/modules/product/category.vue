@@ -6,6 +6,12 @@
       inactive-text="关闭拖拽"
     >
     </el-switch>
+    <el-button
+      type="danger"
+      icon="el-icon-delete"
+      circle
+      @click="batchDelete"
+    ></el-button>
     <el-tree
       :data="data"
       :props="defaultProps"
@@ -17,6 +23,7 @@
       node-key="catId"
       :default-expanded-keys="expandedKey"
       :allow-drop="allowDrop"
+      ref="menuTree"
     >
       <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
@@ -28,14 +35,6 @@
             @click="() => append(data)"
           >
             Append
-          </el-button>
-          <el-button
-            v-if="node.childNodes.length == 0"
-            type="text"
-            size="mini"
-            @click="() => remove(node, data)"
-          >
-            Delete
           </el-button>
           <el-button type="text" size="mini" @click="() => edit(data)">
             Update
@@ -198,43 +197,6 @@ export default {
       this.category.icon = "";
       this.category.productUnit = "";
     },
-    remove(node, data) {
-      // console.log(checkedNodeKeys);
-      var ids = [data.catId];
-      this.$confirm(
-        `确定对[id=${ids.join(",")}]进行[${
-          ids.length == 1 ? "删除" : "批量删除"
-        }]操作?`,
-        "提示",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$http({
-            url: this.$http.adornUrl("/product/category/delete"),
-            method: "post",
-            data: this.$http.adornData(ids, false),
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: "删除成功",
-                type: "success",
-                duration: 1500,
-                onClose: () => {
-                  this.getMenu();
-                  this.expandedKey = [node.parent.data.catId];
-                },
-              });
-            } else {
-              this.$message.error(data.msg);
-            }
-          });
-        })
-        .catch(() => {});
-    },
     edit(data) {
       // console.log("edit:", data);
       this.editDialogVisible = true;
@@ -335,6 +297,43 @@ export default {
           this.updateChildNodeLevel(node.childNodes[i]);
         }
       }
+    },
+    batchDelete() {
+      let checkedNodesKeys = this.$refs.menuTree.getCheckedKeys(false, false);
+      // console.log(checkedNodes)
+      this.$confirm(
+        `确定对[id=${ids.join(",")}]进行[${
+          ids.length == 1 ? "删除" : "批量删除"
+        }]操作?`,
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$http({
+            url: this.$http.adornUrl("/product/category/delete"),
+            method: "post",
+            data: this.$http.adornData(checkedNodesKeys, false),
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: "删除成功",
+                type: "success",
+                duration: 1500,
+                onClose: () => {
+                  this.getMenu();
+                  this.expandedKey = [];
+                },
+              });
+            } else {
+              this.$message.error(data.msg);
+            }
+          });
+        })
+        .catch(() => {});
     },
   },
   created() {
