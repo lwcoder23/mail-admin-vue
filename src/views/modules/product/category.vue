@@ -300,7 +300,7 @@ export default {
     },
     batchDelete() {
       let checkedNodesKeys = this.$refs.menuTree.getCheckedKeys(false, false);
-      console.log(checkedNodesKeys);
+      // console.log(checkedNodesKeys);
       this.$confirm(
         `确定对[id=${checkedNodesKeys.join(",")}]进行[${
           checkedNodesKeys.length == 1 ? "删除" : "批量删除"
