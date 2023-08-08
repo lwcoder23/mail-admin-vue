@@ -21,6 +21,7 @@ import {
   MenuItemGroup,
   Input,
   InputNumber,
+  Image,
   Radio,
   RadioGroup,
   RadioButton,
@@ -90,6 +91,7 @@ Vue.use(MenuItem)
 Vue.use(MenuItemGroup)
 Vue.use(Input)
 Vue.use(InputNumber)
+Vue.use(Image)
 Vue.use(Radio)
 Vue.use(RadioGroup)
 Vue.use(RadioButton)
